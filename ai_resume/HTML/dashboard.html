@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <!-- Chart.js include only once -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1> Resume Dashboard</h1>
+
+        <div class="grid">
+
+            <!-- SCORE -->
+            <div class="card full">
+                <h3>Total Score</h3>
+                <div class="score">{{ score }}/100</div>
+                <canvas id="scoreChart"></canvas>
+            </div>
+
+            <!-- BREAKDOWN -->
+            <div class="card">
+                <h3>Score Breakdown</h3>
+                <ul>
+                    <!-- <li>Required skills: {{ breakdown.required }}</li>  -->
+                    <li>Skills score: {{ breakdown.skills }}</li>
+                    <li>Experience: {{ breakdown.experience }}</li>
+                    <li>Education: {{ breakdown.education }}</li>
+                    <!-- <li>Total Score: {{ breakdown.total }}</li> -->
+
+                </ul>
+                <canvas id="scoreBreakdownChart"></canvas>
+            </div>
+
+            <!-- JOB -->
+            <div class="card">
+                <h3>Recommended Jobs</h3>
+                <ul>
+                    {% for job in jobs %}
+                        <li>{{ job }}</li>
+                    {% endfor %}
+                </ul>
+                <canvas id="jobsChart"></canvas>
+            </div>
+
+            <!-- FOUND -->
+            <div class="card">
+                <h3>Found Skills</h3>
+                <ul>
+                    {% for s in found_skills %}
+                        <li>{{ s }}</li>
+                    {% endfor %}
+                </ul>
+                <canvas id="skillsChart"></canvas>
+            </div>
+
+            <!-- MISSING -->
+            <div class="card">
+                <h3>Missing Skills</h3>
+                <ul>
+                    {% for s in missing_skills %}
+                        <li>{{ s }}</li>
+                    {% endfor %}
+                </ul>
+                <canvas id="missingSkillsChart"></canvas>
+            </div>
+
+            <!-- TIPS -->
+            <div class="card full">
+        
+                <h3>Missing Skills Recommended</h3>
+                <ul>
+                    {% for tip in tips %}
+                        <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+                <canvas id="improvementChart"></canvas>
+            </div>
+
+        </div>
+
+        <a href="{% url 'home' %}">
+            <button>Analyze New Resume</button>
+        </a>
+    </div>
+
+    <!-- Chart.js Script -->
+    <script>
+        // Total Score Chart
+        const ctxScore = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctxScore, {
+            type: 'doughnut',
+            data: {
+                labels: ['Score', 'Remaining'],
+                datasets: [{
+                    data: [{{ score|default:0 }}, 100 - {{ score|default:0 }}],
+                    backgroundColor: ['#4bc0c0', '#e0e0e0']
+                }]
+            }
+        });
+
+        // Breakdown Bar Chart
+        const ctxBreakdown = document.getElementById('scoreBreakdownChart').getContext('2d');
+        new Chart(ctxBreakdown, {
+            type: 'bar',
+            data: {
+                labels: ['Skills', 'Experience', 'Education'],
+                datasets: [{
+                    label: 'Score Breakdown',
+                    data: [
+                        // {{ breakdown.required|default:0 }},
+                        {{ breakdown.skills|default:0 }},
+                        {{ breakdown.experience|default:0 }},
+                        {{ breakdown.education|default:0 }},
+                        // {{ breakdown.total|default:0 }}
+                    ],
+                    backgroundColor: ['#4bc0c0','#ff9f40','#9966ff']
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        // Found vs Missing Skills Pie Chart
+        const ctxSkills = document.getElementById('skillsChart').getContext('2d');
+        new Chart(ctxSkills, {
+            type: 'pie',
+            data: {
+                labels: ['Found Skills', 'Missing Skills'],
+                datasets: [{
+                    data: [{{ found_skills|length }}, {{ missing_skills|length }}],
+                    backgroundColor: ['#36a2eb','#ff6384']
+                }]
+            }
+        });
+
+        // Jobs Chart
+        const ctxJobs = document.getElementById('jobsChart').getContext('2d');
+        new Chart(ctxJobs, {
+            type: 'doughnut',
+            data: {
+                labels: [{% for job in jobs %}'{{ job }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    data: [{% for job in jobs %}1{% if not forloop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: ['#ffcd56','#4bc0c0','#ff6384','#9966ff']
+                }]
+            }
+        });
+
+        // Missing Skills Chart
+        const ctxMissing = document.getElementById('missingSkillsChart').getContext('2d');
+        new Chart(ctxMissing, {
+            type: 'bar',
+            data: {
+                labels: [{% for s in missing_skills %}'{{ s }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Missing Skills',
+                    data: [{% for s in missing_skills %}1{% if not forloop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: '#ff6384'
+                }]
+            }
+        });
+
+        // Improvement Tips Chart
+        const ctxTips = document.getElementById('improvementChart').getContext('2d');
+        new Chart(ctxTips, {
+            type: 'bar',
+            data: {
+                labels: [{% for tip in tips %}'Tip {{ forloop.counter }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Improvement Tips',
+                    data: [{% for tip in tips %}1{% if not forloop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: '#4bc0c0'
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container same as home */
+.container {
+    width: 50%;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+/* Heading */
+h2 {
+    text-align: center;
+    color: #333;
+}
+/* Common info paragraph styling */
+.info {
+    font-size: 18px;
+    margin: 8px 0;
+    color: #333;
+}
+
+/* Name line */
+.name-line {
+    font-weight: bold;
+    color: #222;
+}
+
+/* Role line */
+.role-line {
+    color: #007bff;
+    font-style: italic;
+}
+
+/* ATS Score line */
+.ats-line {
+    color: green;
+    font-weight: 600;
+}
+
+/* Job Match Score line */
+.match-line {
+    color: #ff9800;
+    font-weight: 600;
+}
+.name{
+    font-size: 22px;
+    font-weight:800;
+    color: #222;
+    margin-top: 10px;
+}
+/* Score */
+.score {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: green;
+    margin-top: 10px;
+}
+
+/* Section */
+.section {
+    margin-top: 20px;
+}
+
+/* Lists */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+/* Skills */
+.skills li {
+    background: #e3f2fd;
+}
+
+/* Missing */
+.missing li {
+    background: #ffcdd2;
+}
+
+/* Suggestions */
+.suggestion li {
+    background: #fff9c4;
+}
+
+/* Button */
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Progress Bar */
+.progress-bar {
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-fill {
+    background: green;
+    color: white;
+    padding: 5px;
+    text-align: center;
+}

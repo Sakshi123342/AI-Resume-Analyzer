@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Result</title>
+    <link rel="stylesheet" href="{% static 'css/result.css' %}">
+</head>
+
+<body>
+    <div class="container">
+
+        <h2>Resume Analysis Result</h2>
+
+        <p><Bold>Name:</Bold><span class="name">{{ name }}</span></p>
+        <p><strong>Detected Role:</strong> {{ role }}</p>
+        <p><strong>Job Match Score:</strong> {{ job_match }}%</p>
+
+        <p><strong>ATS Score:</strong> {{ score }}%</p>
+       
+        <div class="progress-bar">
+            <div class="progress-fill" style="width : {{score|default:0 }}%">
+                {{ score|default:0 }}%
+            </div>
+        </div>
+
+        <div class="section skills">
+            <h3>Found Skills:</h3>
+            <ul>
+                {% for skill in found_skills %}
+                <li>{{ skill }}</li>
+                {% empty %}
+                <li>No skills found</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section missing">
+           <h3>Missing Skills:</h3>
+            <ul>
+                {% for skill in missing_skills %}
+                <li>{{ skill }}</li>
+                {% empty %}
+                <li>No missing skills</li>
+                {% endfor %}
+            </ul>
+         </div>
+
+        <div class="section suggestion">
+            <h3>Suggestions:</h3>
+            <ul>
+                {% for s in suggestions %}
+                <li>{{ s }}</li>
+                {% empty %}
+                <li>No suggestions</li>
+                {% endfor %}
+            </ul>
+         </div>
+         
+        <hr>
+        <a href="/scores/">
+            <button>Views Score</button>
+        </a>
+
+    </div>
+</body>
+
+</html>
+
+
+<!--  -->

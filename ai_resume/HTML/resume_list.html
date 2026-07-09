@@ -1,0 +1,526 @@
+<!-- {% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume List</title>
+  <link rel="stylesheet" href="{% static 'css/resume_list.css' %}">
+</head>
+<body>
+  <h2>Resume List</h2>
+  <ul>
+    {% for r in resumes %}
+      <li>
+        <a href="{% url 'resume_details' r.id %}">
+          {{ r.id }} - {{ r.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</body>
+</html> -->
+#***keyword match nahi ho rhe h but ats,job % aacha
+# import re
+# import pdfplumber
+# from django.shortcuts import render, get_object_or_404
+# from .models import ResumeData
+# from .utils import clean_text, extract_skills, calculate_score, missing_skills, get_suggestions, calculate_job_match, score_breakdown, improvement_tips, job_recommendations
+
+# # ✅ New extract_text using pdfplumber
+# from rapidfuzz import fuzz#add
+# def extract_text(file):
+#     text = ""
+#     with pdfplumber.open(file) as pdf:
+#         for page in pdf.pages:
+#             page_text = page.extract_text()
+#             if page_text:
+#                 text += page_text + " "
+#     return text
+
+# # Role-wise keywords dictionary
+# role_keywords = {
+#      "MERN Developer": ["javascript", "js", "react", "reactjs", "node", "nodejs", "mongodb", "express"],
+#      "Python Developer": ["python", "django", "flask", "sql"],
+#      "Data Analyst": ["excel", "tableau", "powerbi", "python", "sql"],
+#      "Java Developer": ["java", "spring", "hibernate", "mysql"],
+#      "Android Developer": ["java", "kotlin", "android", "xml"],
+#      "DevOps Engineer": ["docker", "kubernetes", "ci", "aws", "linux"],
+#      "Cloud Architect": ["aws", "azure", "gcp", "terraform"],
+#      "Cybersecurity Specialist": ["network", "firewalls", "penetration", "siem"],
+#      "Machine Learning Engineer": ["python", "tensorflow", "pytorch", "scikit", "data"]
+# }
+
+# role_priority = [
+#     "MERN Developer", "Java Developer", "Python Developer", "Data Analyst",
+#     "Android Developer", "DevOps Engineer", "Cloud Architect",
+#     "Cybersecurity Specialist", "Machine Learning Engineer"
+# ]
+
+# # Normalize text
+# def normalize_text(text):
+#     text = text.lower()
+#     replacements = {
+#         # MERN
+#         "node.js": "nodejs",
+#         "node.js": "nodejs",
+#         "react.js": "reactjs",
+#         "react js": "reactjs",
+#         "javascript": "js",
+#         "jscript": "js",
+#         "mongo db": "mongodb",
+#         "mongo-db": "mongodb",
+
+        
+#         # Python
+#         "py": "python",
+#         "django framework": "django",
+#         "flask framework": "flask",
+        
+#         # Data Analyst
+#         "power bi": "powerbi",
+#         "ms excel": "excel",
+        
+#         # Java
+#         "spring boot": "spring",
+        
+#         # Android
+#         "android sdk": "android",
+        
+#         # DevOps
+#         "ci/cd": "ci",
+        
+#         # Cloud
+#         "google cloud": "gcp",
+        
+#         # ML/AI
+#         "machine learning": "ml",
+#         "scikit-learn": "scikit",
+#     }
+#     for old, new in replacements.items():
+#         text = text.replace(old, new)
+#     return text
+
+# # Detect role by substring search
+# # remove from rapidfuzz import fuzz
+# def detect_role(resume_text):
+#     resume_text = normalize_text(resume_text)
+#     best_role = "General"
+#     max_score = 0
+
+#     for role in role_priority:
+#         keywords = role_keywords[role]
+#         scores = [fuzz.partial_ratio(k, resume_text) for k in keywords]
+#         avg_score = sum(scores) / len(keywords)
+#         if avg_score > max_score:
+#             max_score = avg_score
+#             best_role = role
+
+#     return best_role
+
+
+
+# # Analyze resume
+# def analyze_resume(resume_text):
+#     resume_text = normalize_text(resume_text)
+#     role = detect_role(resume_text)
+#     required_skills = role_keywords.get(role, [])
+
+#     found_skills, missing_skills, partial_matches = [], [], []
+
+#     for skill in required_skills:
+#         score = fuzz.partial_ratio(skill, resume_text)
+#         if score > 75:
+#             found_skills.append(skill)
+#         elif score > 55:
+#             partial_matches.append(skill)
+#         else:
+#             missing_skills.append(skill)
+
+#     return role, found_skills, missing_skills, partial_matches
+
+# # 🔹 Home view (resume upload + ATS analysis)
+
+# def home(request):
+#     if request.method != 'POST':
+#         return render(request, 'home.html')
+
+#     name = request.POST.get('name')
+#     email = request.POST.get('email')
+#     resume = request.FILES.get('resume')
+#     job_desc = request.POST.get('job_desc')
+
+#     if not resume:
+#         return render(request, 'home.html', {'error': 'Please upload resume'})
+#     if not resume.name.endswith('.pdf'):
+#         return render(request, 'home.html', {'error': 'Only PDF allowed'})
+
+#     # Extract text
+#     text = extract_text(resume)
+#     clean = clean_text(text)
+
+#     # ATS logic
+#     found, total = extract_skills(clean)
+#     ats_score = calculate_score(found, total)
+#     ats_missing = missing_skills(found, total)   # ✅ ATS missing
+#     suggestions = get_suggestions(ats_missing)
+#     match_score = calculate_job_match(clean, job_desc)
+
+#     # Role-based detection
+#     role, found_skills, role_missing_skills, partial_matches = analyze_resume(clean)
+
+#     # Extra features
+#     breakdown = score_breakdown(found, total, clean)
+#     tips = improvement_tips(clean, ats_missing)
+#     jobs = job_recommendations(clean)
+
+#     # Save in session
+#     request.session["breakdown"] = breakdown
+#     request.session["tips"] = tips
+#     request.session["jobs"] = jobs
+#     request.session["found_skills"] = found_skills
+#     request.session["missing_skills"] = role_missing_skills   # ✅ use role_missing_skills
+
+#     # Save to DB
+#     ResumeData.objects.create(
+#         name=name,
+#         email=email,
+#         resume=resume,
+#         job_desc=job_desc,
+#         ats_score=ats_score,
+#         job_match=match_score,
+#         skills_found=", ".join(found_skills),
+#         missing=", ".join(role_missing_skills),   # ✅ use role_missing_skills
+#         job_recommendation=", ".join(suggestions)
+#     )
+
+#     return render(request, 'result.html', {
+#         'name': name,
+#         'score': round(ats_score, 2),
+#         'skills': found_skills,
+#         'missing': role_missing_skills,   # ✅ use role_missing_skills
+#         'suggestions': suggestions,
+#         'match': round(match_score, 2),
+#         'role': role,
+#         'partial_matches': partial_matches,
+#     })
+# # 🔹 Scores page
+# def scores(request):
+#     context = {
+#         "breakdown": request.session.get("breakdown", {}),
+#         "tips": request.session.get("tips", []),
+#         "jobs": request.session.get("jobs", []),
+#     }
+#     return render(request, "scores.html", context)
+
+# # 🔹 Resume detail page (dynamic keyword matching)
+# def resume_detail(request, id):
+#     resume = get_object_or_404(ResumeData, id=id)
+#     text = extract_text(resume.resume)
+
+#     role, found_skills, missing_skills,partial_matches = analyze_resume(text)
+
+#     context = {
+#         "resume": resume,
+#         "role": role,
+#         "found_skills": found_skills,
+#         "missing_skills": missing_skills,
+#         "partial_matches":partial_matches,
+#     }
+#     return render(request, 'resume_detail.html', context)
+
+# # 🔹 Dashboard page
+# def dashboard(request):
+#     context = {
+#         'score': request.session.get("breakdown", {}).get("total", 0),
+#         'breakdown': request.session.get("breakdown", {}),
+#         'tips': request.session.get("tips", []),
+#         'jobs': request.session.get("jobs", []),
+#         'found_skills': request.session.get("found_skills", []),
+#         'missing_skills': request.session.get("missing_skills", [])
+#     }
+#     return render(request, 'dashboard.html', context)
+
+
+# def resume_list(request):
+#     resume = ResumeData.objects.values("id", "name")
+#     return render(request, "resume_list.html", {"resume": resume})
+
+# def resume_detail(request, resume_id):
+#     resume = get_object_or_404(ResumeData, id=resume_id)
+#     return render(request, "resume_detail.html", {"resume": resume})
+
+#***keyword excat match ho rhe h but ats km aa rha h or job match 0***
+
+# import re
+# import pdfplumber
+# from django.shortcuts import render, get_object_or_404
+# from .models import ResumeData
+# from rapidfuzz import fuzz
+
+# # ✅ Extract text from PDF
+# def extract_text(file):
+#     text = ""
+#     with pdfplumber.open(file) as pdf:
+#         for page in pdf.pages:
+#             page_text = page.extract_text()
+#             if page_text:
+#                 text += page_text + " "
+#     return text.lower()
+
+# # ✅ Role-wise keywords dictionary
+# role_keywords = {
+#     "Python Developer": ["python", "django", "flask", "sql"],
+#     "MERN Developer": ["javascript", "react", "node", "mongodb", "express"],
+#     "Data Analyst": ["excel", "tableau", "powerbi", "python", "sql"],
+#     "Java Developer": ["java", "spring", "hibernate", "mysql"],
+#     "Android Developer": ["java", "kotlin", "android", "xml"],
+# }
+
+# # ✅ Auto detect role
+# def detect_role(resume_text):
+#     best_role = "General"
+#     max_matches = 0
+
+#     for role, keywords in role_keywords.items():
+#         matches = sum(1 for k in keywords if k in resume_text)
+#         if matches > max_matches:
+#             max_matches = matches
+#             best_role = role
+
+#     return best_role
+
+# # ✅ Fuzzy keyword match function
+# def match_keywords(resume_text, role):
+#     required_skills = role_keywords.get(role, [])
+#     found_skills, missing_skills = [], []
+
+#     for skill in required_skills:
+#         score = fuzz.partial_ratio(skill, resume_text)
+#         print(f"[DEBUG] Skill: {skill}, Score: {score}")  # Debugging
+#         if score >= 70:   # lenient threshold
+#             found_skills.append(skill)
+#         else:
+#             missing_skills.append(skill)
+
+#     return found_skills, missing_skills
+
+# def calculate_job_match(resume_text, job_desc):
+#     if not job_desc:
+#         return 0
+
+#     resume_text = resume_text.lower()
+#     job_desc = job_desc.lower()
+
+#     resume_words = set(re.findall(r'\w+', resume_text))
+#     job_words = set(re.findall(r'\w+', job_desc))
+
+#     common = resume_words.intersection(job_words)
+
+#     if len(job_words) == 0:
+#         return 0
+#     return (len(common) / len(job_words)) * 100
+
+
+# # ✅ Home view
+# def home(request):
+#     if request.method != 'POST':
+#         return render(request, 'home.html')
+
+#     resume = request.FILES.get('resume')
+#     if not resume:
+#         return render(request, 'home.html', {'error': 'Please upload resume'})
+#     if not resume.name.endswith('.pdf'):
+#         return render(request, 'home.html', {'error': 'Only PDF allowed'})
+
+#     # Extract text
+#     text = extract_text(resume)
+
+#     # ✅ Auto detect role
+#     role = detect_role(text)
+
+#     # ✅ Match keywords for that role
+#     found_skills, missing_skills = match_keywords(text, role)
+
+#     # ✅ ATS score
+#     ats_score = (len(found_skills) / len(role_keywords[role])) * 100 if role in role_keywords else 0
+#     job_desc = request.POST.get('job_desc')
+#     match_score = calculate_job_match(text, job_desc)
+#     # ✅ Suggestions
+#     suggestions = [f"Add {skill}" for skill in missing_skills]
+
+#     # Save to DB
+#     ResumeData.objects.create(
+#         name=request.POST.get('name'),
+#         email=request.POST.get('email'),
+#         resume=resume,
+#         job_desc=request.POST.get('job_desc'),
+#         ats_score=ats_score,
+#         job_match=match_score,  # placeholder
+#         skills_found=", ".join(found_skills),
+#         missing=", ".join(missing_skills),
+#         job_recommendation=", ".join(suggestions)
+#     )
+
+#     return render(request, 'result.html', {
+#         'role': role,
+#         'score': round(ats_score, 2),
+#         'job_match':round(match_score,2),
+#         'found_skills': found_skills,
+#         'missing_skills': missing_skills,
+#         'suggestions': suggestions,
+#     })
+
+
+
+#final solution
+import re
+import pdfplumber
+from django.shortcuts import render, get_object_or_404
+from .models import ResumeData
+from rapidfuzz import fuzz
+
+# ✅ Extract text from PDF
+def extract_text(file):
+    text = ""
+    with pdfplumber.open(file) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + " "
+    return text.lower()
+
+# ✅ Role-wise keywords dictionary
+role_keywords = {
+    "Python Developer": ["python", "django", "flask", "sql"],
+    "Mern Developer": ["javascript", "react", "node", "mongodb", "express"],
+    "Data Analyst": ["excel", "tableau", "powerbi", "python", "sql"],
+    "Java Developer": ["java", "spring", "hibernate", "mysql"],
+    "Android Developer": ["java", "kotlin", "android", "xml"],
+    "Full Stack Developer": ["javascript", "react", "node", "django", "flask", "sql", "mongodb"]
+
+}
+
+# ✅ Auto detect role
+
+def detect_role(resume_text, job_desc):
+    combined_text = (resume_text + " " + job_desc).lower()
+    combined_text = combined_text.replace("-", " ")  # normalize hyphens
+
+    best_role = "General"
+    max_matches = 0
+
+    # पहले role नाम fuzzy match करें
+    for role in role_keywords.keys():
+        role_score = fuzz.partial_ratio(role.lower(), combined_text)
+        print(f"[DEBUG] Role: {role}, Score: {role_score}")
+        if role_score >= 80:   # threshold
+            return role
+
+    # fallback: keyword count
+    for role, keywords in role_keywords.items():
+        matches = sum(1 for k in keywords if k in combined_text)
+        if matches > max_matches:
+            max_matches = matches
+            best_role = role
+
+    return best_role
+    
+
+# ✅ Fuzzy keyword match function
+
+def match_keywords(resume_text, role):
+    required_skills = role_keywords.get(role, [])
+    found_skills, missing_skills = [], []
+
+    text = resume_text.lower()
+
+    for skill in required_skills:
+        skill_lower = skill.lower()
+
+        # Step 1: Regex exact word check
+        if re.search(r'\b' + re.escape(skill_lower) + r'\b', text):
+            found_skills.append(skill)
+            continue
+
+        # Step 2: Fuzzy fallback (for typos/variations)
+        score = fuzz.partial_ratio(skill_lower, text)
+        print(f"[DEBUG] Skill: {skill}, Score: {score}")
+        if score >= 80:   # यहाँ threshold थोड़ा high रखें
+            found_skills.append(skill)
+        else:
+            missing_skills.append(skill)
+
+    return found_skills, missing_skills
+
+def calculate_job_match(resume_text, job_desc):
+    if not job_desc:
+        return 0
+
+    resume_text = resume_text.lower()
+    job_desc = job_desc.lower()
+
+    resume_words = set(re.findall(r'\w+', resume_text))
+    job_words = set(re.findall(r'\w+', job_desc))
+
+    common = resume_words.intersection(job_words)
+
+    if len(job_words) == 0:
+        return 0
+    return (len(common) / len(job_words)) * 100
+
+
+# ✅ Home view
+def home(request):
+    if request.method != 'POST':
+        return render(request, 'home.html')
+
+    resume = request.FILES.get('resume')
+    if not resume:
+        return render(request, 'home.html', {'error': 'Please upload resume'})
+    if not resume.name.endswith('.pdf'):
+        return render(request, 'home.html', {'error': 'Only PDF allowed'})
+
+    # Extract text
+    text = extract_text(resume)
+    job_desc=request.POST.get('job_desc',"")
+    # ✅ Auto detect role
+    role = detect_role(text,job_desc)
+
+    # ✅ Match keywords for that role
+    found_skills, missing_skills = match_keywords(text, role)
+
+    # ✅ ATS score
+    ats_score = (len(found_skills) / len(role_keywords[role])) * 100 if role in role_keywords else 0
+    job_desc = request.POST.get('job_desc')
+    match_score = calculate_job_match(text, job_desc)
+    # ✅ Suggestions
+    suggestions = [f"Add {skill}" for skill in missing_skills]
+
+    # Save to DB
+    ResumeData.objects.create(
+        name=request.POST.get('name'),
+        email=request.POST.get('email'),
+        resume=resume,
+        job_desc=request.POST.get('job_desc'),
+        ats_score=ats_score,
+        job_match=match_score,  # placeholder
+        skills_found=", ".join(found_skills),
+        missing=", ".join(missing_skills),
+        job_recommendation=", ".join(suggestions)
+    )
+
+    return render(request, 'result.html', {
+        'name':request.POST.get('name'),
+        'email':request.POST.get('email'),
+        'role': role,
+        'score': round(ats_score, 2),
+        'job_match':round(match_score,2),
+        'found_skills': found_skills,
+        'missing_skills': missing_skills,
+        'suggestions': suggestions,
+    })
+
+from django.shortcuts import render, get_object_or_404
+from .models import ResumeData
+
+
+

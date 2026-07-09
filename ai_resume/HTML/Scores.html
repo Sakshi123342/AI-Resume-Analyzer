@@ -1,0 +1,502 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Scores</title>
+
+    <link rel="stylesheet" href="{% static 'css/scores.css' %}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2 class="title">Full Resume Report</h2>
+
+        <!-- Score Breakdown -->
+        <div class="section breakdown">
+
+            <h3>Score Breakdown</h3>
+
+            <p>
+                Required Skills:
+
+                <a href="javascript:void(0);" onclick="showSkills()">
+
+                    {{ breakdown.total }}
+
+                </a>
+            </p>
+
+            <!-- Skills List -->
+            <div id="skillsBox" style="display:none; margin-top:10px; text-align:center;">
+
+                <ul style="list-style:none; padding:0; margin:0;">
+
+                    {% for skill in total_skills %}
+
+                    <li>{{ skill }}</li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <p>Skills Score: {{ breakdown.skills }}%</p>
+
+            <p>Experience: {{ breakdown.experience }}%</p>
+
+            <p>Education: {{ breakdown.education }}%</p>
+
+            <p><b>Total Score:</b> {{ breakdown.final_score }}%</p>
+
+        </div>
+
+        <!-- Missing Skills -->
+        <div class="section tips">
+
+            <h3>Missing Skills Recommendations</h3>
+
+            {% for skill in missing_skills %}
+
+            <div style="text-align:center; margin-bottom:10px;">
+
+                <a href="javascript:void(0);" onclick="showTip('{{ skill }}')">
+
+                    {{ skill }}
+
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+            <!-- Recommendation Box -->
+            <div id="tipBox" style="display:none;
+                        margin-top:15px;
+                        text-align:center;">
+
+                <p id="tipText" style="text-align:center;"></p>
+
+            </div>
+
+        </div>
+
+        <!-- Job Recommendations -->
+        <div class="section jobs">
+
+            <h3>Job Recommendations</h3>
+
+            <ul style="list-style:none; padding:0;">
+
+                {% for job in jobs %}
+
+                <li style="margin-bottom:15px; text-align:center;">
+
+                    <a href="javascript:void(0);" onclick="showJob(this, '{{ job }}')">
+
+                        {{ job }}
+
+                    </a>
+
+                    <!-- Dynamic Job Details -->
+                    <div class="job-details" style="display:none;
+                                margin-top:15px;
+                                text-align:center;">
+
+                    </div>
+
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <!-- Dashboard Button -->
+        <a href="/dashboard/">
+
+            <button>View Dashboard</button>
+
+        </a>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+
+        // =========================
+        // Show Skills
+        // =========================
+
+        function showSkills() {
+
+            let box = document.getElementById("skillsBox");
+
+            if (box.style.display === "none") {
+
+                box.style.display = "block";
+
+            }
+
+            else {
+
+                box.style.display = "none";
+
+            }
+        }
+
+        // =========================
+        // Missing Skills Tips
+        // =========================
+
+        function showTip(skill) {
+
+            let tips = {
+
+                "python":
+                    "Learn Python from CodeWithHarry and practice OOP concepts.",
+
+                "django":
+                    "Build Django CRUD and authentication projects.",
+
+                "flask":
+                    "Learn Flask APIs and mini projects from TechGun or CodeWithHarry.",
+
+                "sql":
+                    "Practice SQL queries on LeetCode and HackerRank.",
+
+                "react":
+                    "Build React projects and learn hooks.",
+
+                "javascript":
+                    "Practice DOM, ES6, and async JavaScript.",
+
+                "mongodb":
+                    "Learn MongoDB CRUD operations and aggregation.",
+
+                "node":
+                    "Build backend APIs using Node.js and Express.",
+
+                "express":
+                    "Practice REST APIs using Express.js.",
+
+                "powerbi":
+                    "Create dashboards and visualization projects.",
+
+                "tableau":
+                    "Learn Tableau dashboards and data visualization projects from YouTube and practice on Kaggle.",
+                "fastapi":
+                    "Learn FastAPI and build high-performance APIs using Python.",
+            };
+
+            let box = document.getElementById("tipBox");
+
+            let text = document.getElementById("tipText");
+
+            // ✅ same skill clicked again → close
+            if (box.getAttribute("data-skill") === skill
+                && box.style.display === "block") {
+
+                box.style.display = "none";
+
+                box.removeAttribute("data-skill");
+
+                return;
+            }
+
+            // ✅ show new tip
+            text.innerHTML = tips[skill] || "Improve this skill.";
+
+            box.style.display = "block";
+
+            // ✅ store current skill
+            box.setAttribute("data-skill", skill);
+        }
+        // =========================
+        // Dynamic Job Recommendation
+        // =========================
+
+        function showJob(element, job) {
+
+            let detailsBox =
+                element.parentElement.querySelector(".job-details");
+
+            let roleSlug =
+                job.toLowerCase().replaceAll(" ", "-");
+
+            // ✅ Dynamic role data
+            let roleData = {
+
+                "Python Developer": {
+
+                    companies:
+                        ["TCS", "Infosys", "Wipro", "Accenture"],
+
+                    salary:
+                        "₹4 LPA - ₹12 LPA",
+
+                    experience:
+                        "0-2 Years"
+                },
+
+                "Data Analyst": {
+
+                    companies:
+                        ["Deloitte", "EY", "Infosys", "Capgemini"],
+
+                    salary:
+                        "₹3 LPA - ₹10 LPA",
+
+                    experience:
+                        "0-2 Years"
+                },
+
+                "Mern Stack Developer": {
+
+                    companies:
+                        ["TCS", "Tech Mahindra", "Infosys", "Cognizant"],
+
+                    salary:
+                        "₹4 LPA - ₹11 LPA",
+
+                    experience:
+                        "0-2 Years"
+                },
+
+                "Frontend Developer": {
+
+                    companies:
+                        ["Wipro", "Infosys", "HCL", "Capgemini"],
+
+                    salary:
+                        "₹3 LPA - ₹9 LPA",
+
+                    experience:
+                        "0-2 Years"
+                },
+
+                "Backend Developer": {
+
+                    companies:
+                        ["Infosys", "Accenture", "Cognizant", "TCS"],
+
+                    salary:
+                        "₹4 LPA - ₹10 LPA",
+
+                    experience:
+                        "0-2 Years"
+                },
+
+                "Database Engineer": {
+
+                    companies:
+                        ["Oracle", "IBM", "Accenture", "Infosys"],
+
+                    salary:
+                        "₹5 LPA - ₹12 LPA",
+
+                    experience:
+                        "1-3 Years"
+                }
+            };
+
+            let currentRole = roleData[job] || {
+
+                companies: ["TCS", "Infosys"],
+
+                salary: "₹3 LPA - ₹10 LPA",
+
+                experience: "0-2 Years"
+            };
+
+            // ✅ Toggle close
+            if (detailsBox.style.display === "block") {
+
+                detailsBox.style.display = "none";
+
+                return;
+            }
+
+            // ✅ Close other opened boxes
+            document.querySelectorAll(".job-details")
+                .forEach(box => {
+
+                    box.style.display = "none";
+                });
+
+            // ✅ Dynamic Content
+            detailsBox.innerHTML = `
+
+<div class="dropdown">
+
+    <h4 onclick="toggleDropdown(this)">
+        Top Hiring Companies ▼
+    </h4>
+
+    <div class="dropdown-content" style="display:none">
+
+        <a href="https://www.tcs.com" target="_blank">
+            TCS
+        </a><br><br>
+
+        <a href="https://www.techmahindra.com" target="_blank">
+            Tech Mahindra
+        </a><br><br>
+
+        <a href="https://www.infosys.com" target="_blank">
+            Infosys
+        </a><br><br>
+
+        <a href="https://www.cognizant.com" target="_blank">
+            Cognizant
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="dropdown">
+
+    <h4 onclick="toggleDropdown(this)">
+        Salary Range ▼
+    </h4>
+
+    <div class="dropdown-content" style="display:none;">
+
+        ₹4 LPA - ₹11 LPA
+
+    </div>
+
+</div>
+
+
+<div class="dropdown">
+
+    <h4 onclick="toggleDropdown(this)">
+        Experience ▼
+    </h4>
+
+    <div class="dropdown-content" style="display:none;">
+
+        0-2 Years
+
+    </div>
+
+</div>
+
+
+<div class="dropdown">
+
+    <h4 onclick="toggleDropdown(this)">
+        Apply Jobs ▼
+    </h4>
+
+    <div class="dropdown-content" style="display:none;">
+
+        <a href="https://www.linkedin.com/jobs/${roleSlug}-jobs/"
+           target="_blank">
+
+           LinkedIn Jobs
+
+        </a><br><br>
+
+        <a href="https://www.naukri.com/${roleSlug}-jobs"
+           target="_blank">
+
+           Naukri Jobs
+
+        </a><br><br>
+
+        <a href="https://internshala.com/jobs/${roleSlug}-jobs/"
+           target="_blank">
+
+           Internshala Jobs
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="dropdown">
+
+    <h4 onclick="toggleDropdown(this)">
+        Remote Jobs ▼
+    </h4>
+
+    <div class="dropdown-content" style="display:none;">
+
+        <a href="https://remoteok.com"
+           target="_blank">
+
+           RemoteOK
+
+        </a><br><br>
+
+        <a href="https://weworkremotely.com"
+           target="_blank">
+
+           We Work Remotely
+
+        </a><br><br>
+
+        <a href="https://flexjobs.com"
+           target="_blank">
+
+           FlexJobs
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="dropdown">
+
+    <h4 onclick="toggleDropdown(this)">
+        Interview Questions ▼
+    </h4>
+
+    <div class="dropdown-content" style="display:none;">
+
+        <a href="https://www.geeksforgeeks.org/"
+           target="_blank">
+
+           ${job} Interview Questions
+
+        </a>
+
+    </div>
+
+</div>
+
+`;
+            detailsBox.style.display = "block";
+        }
+        function toggleDropdown(element) {
+
+            let content = element.nextElementSibling;
+
+            if (content.style.display === "block") {
+
+                content.style.display = "none";
+
+            } else {
+
+                content.style.display = "block";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

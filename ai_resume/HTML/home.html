@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+<div class="container">
+    <h2>AI Resume Analyzer</h2>
+    <p>Upload your resume and get instant analysis</p>
+
+    <!-- error message -->
+     {% if error %}
+     <p style="color: red;">{{error}}</p>
+     {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Name:</label>
+        <input type="text" name="name">
+
+        <label>Email:</label>
+        <input type="email" name="email">
+
+        <label>Upload Resume (pdf):</label>
+        <input type="file" name="resume" accept=".pdf">
+
+        <label>Job Description:</label>
+        <textarea name="job_desc"></textarea>
+
+        <button type="submit">Analyze Resume</button>
+    </form>
+</div>
+</body>
+</html>
