@@ -8,6 +8,7 @@ from .utils import detect_role_from_jd
 from .utils import detect_role
 from .utils import clean_text
 from.utils import match_keywords
+import traceback
 # ✅ Extract text from PDF
 def extract_text(file):
     text = ""
@@ -192,109 +193,146 @@ def calculate_job_match(resume_text, job_desc):
 
 
 # ✅ Home view
+# 
 def home(request):
     if request.method != 'POST':
         return render(request, 'home.html')
 
-    resume = request.FILES.get('resume')
-    if not resume:
-        return render(request, 'home.html', {'error': 'Please upload resume'})
-    if not resume.name.endswith('.pdf'):
-        return render(request, 'home.html', {'error': 'Only PDF allowed'})
+    try:
+        print("STEP 1: Resume processing started", flush=True)
 
-    # Extract text
-    text = extract_text(resume)
-    clean_text_data = clean_text(text)
-    job_desc = request.POST.get('job_desc', "")
-    
-    # ✅ Auto detect role
-    role=detect_role_from_jd(job_desc)
-    
-    # ✅ Match keywords for that role
-    found_skills, missing_skills = match_keywords(text, role)
+        resume = request.FILES.get('resume')
 
-    # ✅ ATS score if role in role_keywords else 0
-   
-    # ✅ Extra features for scores/dashboard
-  
-    total_skills = len(role_keywords.get(role, []))
+        if not resume:
+            return render(request, 'home.html', {
+                'error': 'Please upload resume'
+            })
 
-    breakdown = score_breakdown(
-    found_skills,
-    missing_skills,
-    total_skills,
-    text
-)
+        if not resume.name.lower().endswith('.pdf'):
+            return render(request, 'home.html', {
+                'error': 'Only PDF allowed'
+            })
 
-# ✅ ATS = Final Score
-    ats_score = breakdown["final_score"]
+        # Extract text from PDF
+        print("STEP 2: Extracting PDF text", flush=True)
 
-    tips = improvement_tips(missing_skills, job_desc)
+        text = extract_text(resume)
+        clean_text_data = clean_text(text)
 
-    jobs = job_recommendations(found_skills,role)
-    match_score = calculate_job_match(text, job_desc)
+        job_desc = request.POST.get('job_desc', "")
 
-    # ✅ Suggestions
-    from .utils import ai_suggestions
+        # Auto detect role
+        print("STEP 3: Detecting role", flush=True)
 
-    suggestions = ai_suggestions(text, missing_skills, ats_score, role)
+        role = detect_role_from_jd(job_desc)
 
-# ✅ Extra features for scores/dashboard
-    if role == "Mern Stack Developer":
+        print("Detected Role:", role, flush=True)
 
-     total_skills = 5
+        # Match keywords
+        print("STEP 4: Matching skills", flush=True)
 
-    else:
-     total_skills = len(role_keywords.get(role, []))
+        found_skills, missing_skills = match_keywords(text, role)
 
-    # total_skills=len(role_keywords.get(role, []))
-    breakdown = score_breakdown(found_skills,missing_skills,total_skills,text)              # pass resume text
-    tips = improvement_tips(missing_skills, job_desc)        # pass resume text + job description
-    jobs = job_recommendations(found_skills,role)               # pass resume text
+        print("Found Skills:", found_skills, flush=True)
+        print("Missing Skills:", missing_skills, flush=True)
 
-    # Save in session
-    
-    request.session["breakdown"] = breakdown
-    request.session["tips"] = tips
-    request.session["jobs"] = jobs
-    request.session["found_skills"] = found_skills
-    request.session["missing_skills"] = missing_skills
-    if role == "Mern Stack Developer":
+        # Calculate total skills
+        total_skills = len(role_keywords.get(role, []))
 
-     request.session["total_skills"] = [
-        "react",
-        "node",
-        "express",
-        "mongodb",
-        "javascript"
-    ]
+        if role == "Mern Stack Developer":
+            total_skills = 5
 
-    else:
+        # Calculate ATS score
+        print("STEP 5: Calculating ATS score", flush=True)
 
-     request.session["total_skills"] = role_keywords.get(role, [])
-    # Save to DB
-    ResumeData.objects.create(
-        name=request.POST.get('name'),
-        email=request.POST.get('email'),
-        resume=resume,
-        job_desc=job_desc,
-        ats_score=ats_score,
-        job_match=match_score,
-        skills_found=", ".join(found_skills),
-        missing=", ".join(missing_skills),
-        job_recommendation=", ".join(suggestions)
-    )
+        breakdown = score_breakdown(
+            found_skills,
+            missing_skills,
+            total_skills,
+            text
+        )
 
-    return render(request, 'result.html', {
-        'name': request.POST.get('name'),
-        'email': request.POST.get('email'),
-        'role': role,
-        'score': round(ats_score, 2),
-        'job_match': round(match_score, 2),
-        'found_skills': found_skills,
-        'missing_skills': missing_skills,
-        'suggestions': suggestions,
-    })
+        ats_score = breakdown["final_score"]
+
+        print("ATS Score:", ats_score, flush=True)
+
+        # Improvement tips
+        print("STEP 6: Generating tips and jobs", flush=True)
+
+        tips = improvement_tips(missing_skills, job_desc)
+
+        jobs = job_recommendations(found_skills, role)
+
+        match_score = calculate_job_match(text, job_desc)
+
+        # AI suggestions
+        print("STEP 7: Generating AI suggestions", flush=True)
+
+        from .utils import ai_suggestions
+
+        suggestions = ai_suggestions(
+            text,
+            missing_skills,
+            ats_score,
+            role
+        )
+
+        # Save data in session
+        print("STEP 8: Saving session data", flush=True)
+
+        request.session["breakdown"] = breakdown
+        request.session["tips"] = tips
+        request.session["jobs"] = jobs
+        request.session["found_skills"] = found_skills
+        request.session["missing_skills"] = missing_skills
+
+        if role == "Mern Stack Developer":
+            request.session["total_skills"] = [
+                "react",
+                "node",
+                "express",
+                "mongodb",
+                "javascript"
+            ]
+        else:
+            request.session["total_skills"] = role_keywords.get(role, [])
+
+        # Save resume in database
+        print("STEP 9: Saving resume in database", flush=True)
+
+        ResumeData.objects.create(
+            name=request.POST.get('name'),
+            email=request.POST.get('email'),
+            resume=resume,
+            job_desc=job_desc,
+            ats_score=ats_score,
+            job_match=match_score,
+            skills_found=", ".join(found_skills),
+            missing=", ".join(missing_skills),
+            job_recommendation=", ".join(suggestions)
+        )
+
+        # Open result page
+        print("STEP 10: Opening result page", flush=True)
+
+        return render(request, 'result.html', {
+            'name': request.POST.get('name'),
+            'email': request.POST.get('email'),
+            'role': role,
+            'score': round(ats_score, 2),
+            'job_match': round(match_score, 2),
+            'found_skills': found_skills,
+            'missing_skills': missing_skills,
+            'suggestions': suggestions,
+        })
+
+    except Exception as e:
+        print("HOME VIEW ERROR:", repr(e), flush=True)
+        traceback.print_exc()
+
+        return render(request, 'home.html', {
+            'error': 'Resume analysis failed. Please try again.'
+        })
 
 
 # ✅ Scores view
