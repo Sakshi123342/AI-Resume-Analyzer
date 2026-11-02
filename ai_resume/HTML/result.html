@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,59 +6,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATS Result</title>
-    <link rel="stylesheet" href="{% static 'css/result.css' %}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 50%;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .info {
+            font-size: 18px;
+            margin: 8px 0;
+            color: #333;
+        }
+
+        .name-line {
+            font-weight: bold;
+            color: #222;
+        }
+
+        .role-line {
+            color: #007bff;
+            font-style: italic;
+        }
+
+        .ats-line {
+            color: green;
+            font-weight: 600;
+        }
+
+        .match-line {
+            color: #ff9800;
+            font-weight: 600;
+        }
+
+        .name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #222;
+            margin-top: 10px;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: green;
+            margin-top: 10px;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .skills li {
+            background: #e3f2fd;
+        }
+
+        .missing li {
+            background: #ffcdd2;
+        }
+
+        .suggestion li {
+            background: #fff9c4;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .progress-bar {
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            background: green;
+            color: white;
+            padding: 5px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: auto;
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #667eea, #764ba2);
-        margin: 0;
-        padding: 0;
-    }
-
-    .container {
-        width: 30%;
-        margin: 50px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    h2 {
-        text-align: center;
-        color: #333;
-    }
-
-    label {
-        font-weight: bold;
-    }
-
-    input,
-    textarea {
-        width: 95%;
-        padding: 10px;
-        margin-top: 5px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    button {
-        width: 98%;
-        padding: 12px;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: #5a67d8;
-    }
-</style>
 
 <body>
     <div class="container">
@@ -66,15 +142,19 @@
         <h2>Resume Analysis Result</h2>
 
         <p>
-            <Bold>Name:</Bold><span class="name">{{ name }}</span>
+            <strong>Name:</strong>
+            <span class="name">{{ name }}</span>
         </p>
+
         <p><strong>Detected Role:</strong> {{ role }}</p>
+
         <p><strong>Job Match Score:</strong> {{ job_match }}%</p>
 
         <p><strong>ATS Score:</strong> {{ score }}%</p>
 
         <div class="progress-bar">
-            <div class="progress-fill" style="width : {{score|default:0 }}%">
+            <div class="progress-fill"
+                 style="width: {{ score|default:0 }}%">
                 {{ score|default:0 }}%
             </div>
         </div>
@@ -83,9 +163,9 @@
             <h3>Found Skills:</h3>
             <ul>
                 {% for skill in found_skills %}
-                <li>{{ skill }}</li>
+                    <li>{{ skill }}</li>
                 {% empty %}
-                <li>No skills found</li>
+                    <li>No skills found</li>
                 {% endfor %}
             </ul>
         </div>
@@ -94,9 +174,9 @@
             <h3>Missing Skills:</h3>
             <ul>
                 {% for skill in missing_skills %}
-                <li>{{ skill }}</li>
+                    <li>{{ skill }}</li>
                 {% empty %}
-                <li>No missing skills</li>
+                    <li>No missing skills</li>
                 {% endfor %}
             </ul>
         </div>
@@ -105,16 +185,17 @@
             <h3>Suggestions:</h3>
             <ul>
                 {% for s in suggestions %}
-                <li>{{ s }}</li>
+                    <li>{{ s }}</li>
                 {% empty %}
-                <li>No suggestions</li>
+                    <li>No suggestions</li>
                 {% endfor %}
             </ul>
         </div>
 
         <hr>
+
         <a href="/scores/">
-            <button>Views Score</button>
+            <button type="button">View Scores</button>
         </a>
 
     </div>
