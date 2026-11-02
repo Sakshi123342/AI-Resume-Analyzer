@@ -8,18 +8,71 @@
     <title>ATS Result</title>
     <link rel="stylesheet" href="{% static 'css/result.css' %}">
 </head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #667eea, #764ba2);
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 30%;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input,
+    textarea {
+        width: 95%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 98%;
+        padding: 12px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #5a67d8;
+    }
+</style>
 
 <body>
     <div class="container">
 
         <h2>Resume Analysis Result</h2>
 
-        <p><Bold>Name:</Bold><span class="name">{{ name }}</span></p>
+        <p>
+            <Bold>Name:</Bold><span class="name">{{ name }}</span>
+        </p>
         <p><strong>Detected Role:</strong> {{ role }}</p>
         <p><strong>Job Match Score:</strong> {{ job_match }}%</p>
 
         <p><strong>ATS Score:</strong> {{ score }}%</p>
-       
+
         <div class="progress-bar">
             <div class="progress-fill" style="width : {{score|default:0 }}%">
                 {{ score|default:0 }}%
@@ -38,7 +91,7 @@
         </div>
 
         <div class="section missing">
-           <h3>Missing Skills:</h3>
+            <h3>Missing Skills:</h3>
             <ul>
                 {% for skill in missing_skills %}
                 <li>{{ skill }}</li>
@@ -46,7 +99,7 @@
                 <li>No missing skills</li>
                 {% endfor %}
             </ul>
-         </div>
+        </div>
 
         <div class="section suggestion">
             <h3>Suggestions:</h3>
@@ -57,8 +110,8 @@
                 <li>No suggestions</li>
                 {% endfor %}
             </ul>
-         </div>
-         
+        </div>
+
         <hr>
         <a href="/scores/">
             <button>Views Score</button>
@@ -68,6 +121,3 @@
 </body>
 
 </html>
-
-
-<!--  -->
