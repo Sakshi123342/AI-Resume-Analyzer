@@ -13,7 +13,11 @@ SECRET_KEY = 'django-insecure-97@x+e1pu+246i2*%53@)!qw#_7+p^z&u#tp7du4bb^_m0x_n8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'ai-resume-analyzer-1wls.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
