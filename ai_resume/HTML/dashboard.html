@@ -18,11 +18,9 @@
         }
 
         /* Container */
-        /* Container */
         .container {
-            width: 95%;
+            width: 150%;
             max-width: 1200px;
-            box-sizing: border-box;
             margin: 30px auto;
             text-align: center;
             background: rgba(255, 255, 255, 0.85);
@@ -283,7 +281,13 @@
             }
         }
     </style>
-
+    {% if IS_RENDER %}
+    <style>
+        .grid>.card.full:first-child {
+            grid-column: span 1;
+        }
+    </style>
+    {% endif %}
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
