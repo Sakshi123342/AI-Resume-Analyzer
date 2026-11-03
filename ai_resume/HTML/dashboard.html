@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,9 +18,11 @@
         }
 
         /* Container */
+        /* Container */
         .container {
-            width: 150%;
+            width: 95%;
             max-width: 1200px;
+            box-sizing: border-box;
             margin: 30px auto;
             text-align: center;
             background: rgba(255, 255, 255, 0.85);
@@ -253,6 +255,7 @@
 
         /* Responsive Design */
         @media (max-width: 900px) {
+
             .stats,
             .actions {
                 grid-template-columns: repeat(2, 1fr);
@@ -319,9 +322,9 @@
 
                 <ul>
                     {% for job in jobs %}
-                        <li>{{ job }}</li>
+                    <li>{{ job }}</li>
                     {% empty %}
-                        <li>No recommended jobs available.</li>
+                    <li>No recommended jobs available.</li>
                     {% endfor %}
                 </ul>
 
@@ -334,9 +337,9 @@
 
                 <ul>
                     {% for s in found_skills %}
-                        <li>{{ s }}</li>
+                    <li>{{ s }}</li>
                     {% empty %}
-                        <li>No skills found.</li>
+                    <li>No skills found.</li>
                     {% endfor %}
                 </ul>
 
@@ -349,9 +352,9 @@
 
                 <ul>
                     {% for s in missing_skills %}
-                        <li>{{ s }}</li>
+                    <li>{{ s }}</li>
                     {% empty %}
-                        <li>No missing skills.</li>
+                    <li>No missing skills.</li>
                     {% endfor %}
                 </ul>
 
@@ -364,9 +367,9 @@
 
                 <ul>
                     {% for tip in tips %}
-                        <li>{{ tip }}</li>
+                    <li>{{ tip }}</li>
                     {% empty %}
-                        <li>No improvement tips available.</li>
+                    <li>No improvement tips available.</li>
                     {% endfor %}
                 </ul>
 
@@ -444,10 +447,10 @@
                 labels: ['Found Skills', 'Missing Skills'],
                 datasets: [{
                     data: [
-                        {{ found_skills|length }},
-                        {{ missing_skills|length }}
+                        {{ found_skills| length }},
+                        {{ missing_skills| length }}
                     ],
-                    backgroundColor: ['#36a2eb', '#ff6384']
+            backgroundColor: ['#36a2eb', '#ff6384']
                 }]
             }
         });
@@ -461,21 +464,21 @@
             data: {
                 labels: [
                     {% for job in jobs %}
-                        '{{ job|escapejs }}'{% if not forloop.last %},{% endif %}
-                    {% endfor %}
+                        '{{ job|escapejs }}'{% if not forloop.last %}, {% endif %}
+            {% endfor %}
                 ],
-                datasets: [{
-                    data: [
-                        {% for job in jobs %}
-                            1{% if not forloop.last %},{% endif %}
-                        {% endfor %}
+            datasets: [{
+                data: [
+                    {% for job in jobs %}
+                            1{% if not forloop.last %}, {% endif %}
+        {% endfor %}
                     ],
-                    backgroundColor: [
-                        '#ffcd56',
-                        '#4bc0c0',
-                        '#ff6384',
-                        '#9966ff'
-                    ]
+        backgroundColor: [
+            '#ffcd56',
+            '#4bc0c0',
+            '#ff6384',
+            '#9966ff'
+        ]
                 }]
             }
         });
@@ -489,27 +492,27 @@
             data: {
                 labels: [
                     {% for s in missing_skills %}
-                        '{{ s|escapejs }}'{% if not forloop.last %},{% endif %}
-                    {% endfor %}
+                        '{{ s|escapejs }}'{% if not forloop.last %}, {% endif %}
+            {% endfor %}
                 ],
-                datasets: [{
-                    label: 'Missing Skills',
-                    data: [
-                        {% for s in missing_skills %}
-                            1{% if not forloop.last %},{% endif %}
-                        {% endfor %}
+            datasets: [{
+                label: 'Missing Skills',
+                data: [
+                    {% for s in missing_skills %}
+                            1{% if not forloop.last %}, {% endif %}
+        {% endfor %}
                     ],
-                    backgroundColor: '#ff6384'
+        backgroundColor: '#ff6384'
                 }]
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                responsive: true
-            }
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            responsive: true
+        }
         });
 
 
@@ -521,30 +524,31 @@
             data: {
                 labels: [
                     {% for tip in tips %}
-                        'Tip {{ forloop.counter }}'{% if not forloop.last %},{% endif %}
-                    {% endfor %}
+                        'Tip {{ forloop.counter }}'{% if not forloop.last %}, {% endif %}
+            {% endfor %}
                 ],
-                datasets: [{
-                    label: 'Improvement Tips',
-                    data: [
-                        {% for tip in tips %}
-                            1{% if not forloop.last %},{% endif %}
-                        {% endfor %}
+            datasets: [{
+                label: 'Improvement Tips',
+                data: [
+                    {% for tip in tips %}
+                            1{% if not forloop.last %}, {% endif %}
+        {% endfor %}
                     ],
-                    backgroundColor: '#4bc0c0'
+        backgroundColor: '#4bc0c0'
                 }]
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                responsive: true
-            }
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            responsive: true
+        }
         });
 
     </script>
 
 </body>
+
 </html>
