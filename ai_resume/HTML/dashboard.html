@@ -283,12 +283,46 @@
     </style>
     {% if IS_RENDER %}
     <style>
+        /* Desktop: local screenshot jaisa layout */
         .grid {
             grid-template-columns: repeat(4, minmax(0, 1fr));
         }
 
         .grid>.card.full {
             grid-column: span 2;
+        }
+
+        /* Tablet */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .grid>.card,
+            .grid>.card.full {
+                grid-column: span 1;
+                width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+
+            .container {
+                width: auto;
+                margin: 15px;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
         }
     </style>
     {% endif %}
