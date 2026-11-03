@@ -283,8 +283,12 @@
     </style>
     {% if IS_RENDER %}
     <style>
-        .grid>.card.full:first-child {
-            grid-column: span 1;
+        .grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .grid>.card.full {
+            grid-column: span 2;
         }
     </style>
     {% endif %}
